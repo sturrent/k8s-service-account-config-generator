@@ -33,3 +33,45 @@ KUBECONFIG=~/.kube/config:<EXTRA_CONFIG_FILE> kubectl config view --flatten > <N
 EX:
 ~$ KUBECONFIG=~/.kube/config:devuser1-on-akscluster1 kubectl config view --flatten > new_cube_conf
 ```
+
+# Roles and Rolebindings
+Once you have a new service account, by default it will not have any privileges.
+You will have to use roles and rolebindings to grant privileges for that account.
+And the cluster must have RBAC enabled, if not the service accounts will not have any restrictions.
+
+Here is a pod reader sample creating a new role `pod-reader` for service account `dev1user` and the corresponding rolebinding:
+
+```
+# Role
+cat <<EOF | kubectl create -f -
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+EOF
+```
+
+```
+# Rolebinding
+cat <<EOF | kubectl create -f -
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-reader-dev1user
+subjects:
+- kind: ServiceAccount
+  name: dev1user
+  namespace: default
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+EOF
+```
+
+After those are in place the `dev1user` can use read-only commands with pods over the default namespace.
