@@ -1,10 +1,10 @@
 #!/bin/bash
 
-##Beta V-0.3.2 
+##Beta V-0.3.5
 ## Creating service account and getting a corresponding kube config file for that
 #"-u|--user" requires an arument i.e "-u devuser1"
 #"-h|--help" help info, no arguments required
-#"-n|--name" Namespace (if not provided it will use default namesapce)
+#"-n|--namespace" Namespace (if not provided it will use default namesapce)
 #"-f|--filename" Output file name (if not provided will use <CLUSTERNAME>-context)'
 
 # read the options
@@ -65,17 +65,17 @@ fi
 #if -h | --help option is selected or if anything other than -c or -v is selected, usage will be displayed
 if [ $HELP -eq 1 ]
 then
-	echo "Service account config generation, usage: $SCRIPTPATH/$SCRIPT_NAME -u|--user <SERVICE_ACCOUNT_NAME> [-n|--name-space <NAMESPACE>] [-f|--filename] <OUTPUT_FILE_NAME>"
+	echo "Service account config generation, usage: $SCRIPTPATH/$SCRIPT_NAME -u|--user <SERVICE_ACCOUNT_NAME> [-n|--namespace <NAMESPACE>] [-f|--filename] <OUTPUT_FILE_NAME>"
 	echo -e '\n"-u|--user" requires an arument i.e "-u devuser1"
 "-h|--help" help info, no arguments required
-"-n|--name" Namespace (if not provided it will use default namesapce)
+"-n|--namespace" Namespace (if not provided it will use default namesapce)
 "-f|--filename" Output file name (if not provided will use <CLUSTERNAME>-context)'
 	exit 0
 fi
 
 if [ -z $SA_NAME ]; then
 	echo -e "Error: Service account name must be provided. \n"
-	echo -e "Service account config generation, usage: $SCRIPTPATH/$SCRIPT_NAME -u|--user <SERVICE_ACCOUNT_NAME> [-n|--name-space <NAMESPACE>] [-f|--filename] <OUTPUT_FILE_NAME>\n"
+	echo -e "Service account config generation, usage: $SCRIPTPATH/$SCRIPT_NAME -u|--user <SERVICE_ACCOUNT_NAME> [-n|--namespace <NAMESPACE>] [-f|--filename] <OUTPUT_FILE_NAME>\n"
 	exit 5
 fi
 
