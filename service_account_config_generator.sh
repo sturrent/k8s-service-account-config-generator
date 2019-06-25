@@ -38,7 +38,9 @@ do
     esac
 done
 
-## vars and initialization 
+## vars and initialization
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+SCRIPT_NAME="$(echo $0 | sed 's|\.\/||g')" 
 if [ "$NAMESPACE" == "" ]; then
     NAMESPACE=default
     NAMESPACE_IS_DEFAULT=1
