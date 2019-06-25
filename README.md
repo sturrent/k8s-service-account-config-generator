@@ -19,11 +19,11 @@ EX:
 # Usage
 ```
 ~$ bash service_account_config_generator.sh -h
-Service account config generation, usage: / -u|--user <SERVICE_ACCOUNT_NAME> [-n|--name-space <NAMESPACE>] [-f|--filename] <OUTPUT_FILE_NAME>
+Service account config generation, usage: / -u|--user <SERVICE_ACCOUNT_NAME> [-n|--namespace <NAMESPACE>] [-f|--filename] <OUTPUT_FILE_NAME>
 
 "-u|--user" requires an arument i.e "-u devuser1"
 "-h|--help" help info, no arguments required
-"-n|--name" Namespace (if not provided it will use default namesapce)
+"-n|--namespace" Namespace (if not provided it will use default namesapce)
 "-f|--filename" Output file name (if not provided will use <CLUSTERNAME>-context)
 ```
 # Simpla way to merge kube config files
