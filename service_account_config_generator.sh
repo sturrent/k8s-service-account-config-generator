@@ -1,6 +1,11 @@
 #!/bin/bash
 
+##Beta V-0.3.2 
 ## Creating service account and getting a corresponding kube config file for that
+#"-u|--user" requires an arument i.e "-u devuser1"
+#"-h|--help" help info, no arguments required
+#"-n|--name" Namespace (if not provided it will use default namesapce)
+#"-f|--filename" Output file name (if not provided will use <CLUSTERNAME>-context)'
 
 # read the options
 TEMP=`getopt -o u:n:f:h --long user:,namespace:,filename:,help -n 'service_account_config_generator.sh' -- "$@"`
@@ -50,8 +55,8 @@ if [ -f $CONFIG_FILE ]; then
 fi
 
 # check for package dependencies
-if [ "$(which jq)" == "" ]; then
-	echo -e "Error: Missing \"jq\" binary, you can install it with: sudo apt install jq\n"
+if [ "$(which kubectl)" == "" ]; then
+	echo -e "Error: Missing \"kubectl\" binary...\n"
 	exit 4
 fi
 
@@ -61,7 +66,6 @@ then
 	echo "Service account config generation, usage: $SCRIPTPATH/$SCRIPT_NAME -u|--user <SERVICE_ACCOUNT_NAME> [-n|--name-space <NAMESPACE>] [-f|--filename] <OUTPUT_FILE_NAME>"
 	echo -e '\n"-u|--user" requires an arument i.e "-u devuser1"
 "-h|--help" help info, no arguments required
-"-u|--user" Service account name
 "-n|--name" Namespace (if not provided it will use default namesapce)
 "-f|--filename" Output file name (if not provided will use <CLUSTERNAME>-context)'
 	exit 0
@@ -87,13 +91,13 @@ echo -e "\nCreating service account..."
 kubectl create sa $SA_NAME -n $NAMESPACE
 
 # get secrete for service account
-SA_SECRETE=$(kubectl -n $NAMESPACE get sa $SA_NAME -o json | jq -r .secrets[].name)
+SA_SECRETE=$(kubectl -n $NAMESPACE get sa $SA_NAME -o yaml | grep token | awk '{print $NF}')
 
 # get ca cert
-kubectl -n $NAMESPACE get secret $SA_SECRETE -o json | jq -r '.data["ca.crt"]' | base64 -d > /tmp/temp_ca_server.crt
+kubectl -n $NAMESPACE get secret $SA_SECRETE -o yaml | grep 'ca.crt:' | awk '{print $2}' | base64 -d > /tmp/temp_ca_server.crt
 
 # get sa token
-SA_TOKEN=$(kubectl -n $NAMESPACE get secret $SA_SECRETE -o json | jq -r '.data["token"]' | base64 -d)
+SA_TOKEN=$(kubectl -n $NAMESPACE get secret $SA_SECRETE -o yaml | grep 'token:' | awk '{print $2}' | base64 -d)
 
 ## get info from cluster and context
 
