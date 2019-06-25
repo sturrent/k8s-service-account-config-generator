@@ -1,6 +1,11 @@
 #!/bin/bash
 
+##Beta V-0.3.5
 ## Creating service account and getting a corresponding kube config file for that
+#"-u|--user" requires an arument i.e "-u devuser1"
+#"-h|--help" help info, no arguments required
+#"-n|--namespace" Namespace (if not provided it will use default namesapce)
+#"-f|--filename" Output file name (if not provided will use <CLUSTERNAME>-context)'
 
 # read the options
 TEMP=`getopt -o u:n:f:h --long user:,namespace:,filename:,help -n 'service_account_config_generator.sh' -- "$@"`
@@ -33,7 +38,9 @@ do
     esac
 done
 
-## vars and initialization 
+## vars and initialization
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+SCRIPT_NAME="$(echo $0 | sed 's|\.\/||g')" 
 if [ "$NAMESPACE" == "" ]; then
     NAMESPACE=default
     NAMESPACE_IS_DEFAULT=1
@@ -50,26 +57,25 @@ if [ -f $CONFIG_FILE ]; then
 fi
 
 # check for package dependencies
-if [ "$(which jq)" == "" ]; then
-	echo -e "Error: Missing \"jq\" binary, you can install it with: sudo apt install jq\n"
+if [ "$(which kubectl)" == "" ]; then
+	echo -e "Error: Missing \"kubectl\" binary...\n"
 	exit 4
 fi
 
 #if -h | --help option is selected or if anything other than -c or -v is selected, usage will be displayed
 if [ $HELP -eq 1 ]
 then
-	echo "Service account config generation, usage: $SCRIPTPATH/$SCRIPT_NAME -u|--user <SERVICE_ACCOUNT_NAME> [-n|--name-space <NAMESPACE>] [-f|--filename] <OUTPUT_FILE_NAME>"
+	echo "Service account config generation, usage: $SCRIPTPATH/$SCRIPT_NAME -u|--user <SERVICE_ACCOUNT_NAME> [-n|--namespace <NAMESPACE>] [-f|--filename] <OUTPUT_FILE_NAME>"
 	echo -e '\n"-u|--user" requires an arument i.e "-u devuser1"
 "-h|--help" help info, no arguments required
-"-u|--user" Service account name
-"-n|--name" Namespace (if not provided it will use default namesapce)
+"-n|--namespace" Namespace (if not provided it will use default namesapce)
 "-f|--filename" Output file name (if not provided will use <CLUSTERNAME>-context)'
 	exit 0
 fi
 
 if [ -z $SA_NAME ]; then
 	echo -e "Error: Service account name must be provided. \n"
-	echo -e "Service account config generation, usage: $SCRIPTPATH/$SCRIPT_NAME -u|--user <SERVICE_ACCOUNT_NAME> [-n|--name-space <NAMESPACE>] [-f|--filename] <OUTPUT_FILE_NAME>\n"
+	echo -e "Service account config generation, usage: $SCRIPTPATH/$SCRIPT_NAME -u|--user <SERVICE_ACCOUNT_NAME> [-n|--namespace <NAMESPACE>] [-f|--filename] <OUTPUT_FILE_NAME>\n"
 	exit 5
 fi
 
@@ -87,13 +93,13 @@ echo -e "\nCreating service account..."
 kubectl create sa $SA_NAME -n $NAMESPACE
 
 # get secrete for service account
-SA_SECRETE=$(kubectl -n $NAMESPACE get sa $SA_NAME -o json | jq -r .secrets[].name)
+SA_SECRETE=$(kubectl -n $NAMESPACE get sa $SA_NAME -o yaml | grep token | awk '{print $NF}')
 
 # get ca cert
-kubectl -n $NAMESPACE get secret $SA_SECRETE -o json | jq -r '.data["ca.crt"]' | base64 -d > /tmp/temp_ca_server.crt
+kubectl -n $NAMESPACE get secret $SA_SECRETE -o yaml | grep 'ca.crt:' | awk '{print $2}' | base64 -d > /tmp/temp_ca_server.crt
 
 # get sa token
-SA_TOKEN=$(kubectl -n $NAMESPACE get secret $SA_SECRETE -o json | jq -r '.data["token"]' | base64 -d)
+SA_TOKEN=$(kubectl -n $NAMESPACE get secret $SA_SECRETE -o yaml | grep 'token:' | awk '{print $2}' | base64 -d)
 
 ## get info from cluster and context
 
