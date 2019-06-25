@@ -1,7 +1,7 @@
 # k8s-service-account-config-generator
-Bash script to generate a new service account in a specified name spaced and created the corresponding config file.
+Bash script to generate a new service account in a specified namespace and create the corresponding config file.
 The script will create a service account and generate the corresponding kube config file to authenticate with that account.
-If no namesapce is specified the script will use the default one, and if a different namespace is provided the script will create it if is not already in place.
+If no namespace is specified the script will use the default one, and if a different namespace is provided the script will create it if is not already in place.
 
 # Getting the script
 You can download the `service_account_generator.sh` file or clone this git repo.
