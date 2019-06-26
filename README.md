@@ -13,10 +13,16 @@ I Can Use Service Accounts for User Access
 This is a bad idea on multiple levels:
 
     Service Accounts are not built for humans, they’re built for automation tasks
-    The tokens are long lived bearer tokens, which means if you have it you can use it and if it’s compromised through accidentally storing it in a git repo or logging it in debug messages it can be abused.
+    The tokens are long lived bearer tokens, which means if you have it you can use it and if it’s compromised through
+    accidentally storing it in a git repo or logging it in debug messages it can be abused.
     The ServiceAccount object in k8s can’t be a member of a group, making it harder to manage authorizations in RBAC
 
-I know doing this seems like a good idea.  It’s simple, right? Not so fast. How are you getting the service account from the admin that generates it to the user who uses it?  Email? Slack? How are you rotating the tokens? Auditing access? Disabling once no longer needed? These aspects of identity are just as important as authentication.  By trying to avoid the “complexity” of external authentication you’re actually introducing more risk. Use OpenID Connect. Whether your environment uses Active Directory, LDAP or Google take a look at Orchestra to automate your logins, we take care of most of the complexities of OIDC for you!
+I know doing this seems like a good idea.  It’s simple, right? Not so fast. How are you getting the service account from the
+admin that generates it to the user who uses it?  Email? Slack? How are you rotating the tokens? Auditing access? Disabling once
+no longer needed? These aspects of identity are just as important as authentication.  By trying to avoid the “complexity” of
+external authentication you’re actually introducing more risk. Use OpenID Connect. Whether your environment uses Active
+Directory, LDAP or Google take a look at Orchestra to automate your logins, we take care of most of the complexities of
+OIDC for you!
 ```
 Also check https://www.linuxjournal.com/content/kubernetes-identity-management-authentication
 
