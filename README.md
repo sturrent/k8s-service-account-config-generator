@@ -49,7 +49,7 @@ Service account config generation, usage: / -u|--user <SERVICE_ACCOUNT_NAME> [-n
 "-n|--namespace" Namespace (if not provided it will use default namesapce)
 "-f|--filename" Output file name (if not provided will use <CLUSTERNAME>-context)
 ```
-# Simpla way to merge kube config files
+# Simple way to merge kube config files
 ```
 KUBECONFIG=~/.kube/config:<EXTRA_CONFIG_FILE> kubectl config view --flatten > <NEW_CONF_WITH_BOTH_FILES>
 
